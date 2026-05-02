@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OaLeaveMapper">
+
+    <resultMap type="OaLeave" id="OaLeaveResult">
+        <result property="leaveId"         column="leave_id"        />
+        <result property="leaveType"       column="leave_type"      />
+        <result property="startTime"        column="start_time"      />
+        <result property="endTime"         column="end_time"        />
+        <result property="leaveDays"       column="leave_days"      />
+        <result property="leaveReason"     column="leave_reason"    />
+        <result property="applyTime"       column="apply_time"      />
+        <result property="flowId"          column="flow_id"         />
+        <result property="currentStep"     column="current_step"   />
+        <result property="approvalStatus"  column="approval_status" />
+        <result property="createBy"         column="create_by"       />
+        <result property="createTime"      column="create_time"     />
+        <result property="updateBy"        column="update_by"       />
+        <result property="updateTime"      column="update_time"     />
+        <result property="remark"           column="remark"          />
+    </resultMap>
+
+    <sql id="selectOaLeaveVo">
+        select leave_id, leave_type, start_time, end_time, leave_days, leave_reason,
+               apply_time, flow_id, current_step, approval_status, create_by, create_time,
+               update_by, update_time, remark
+        from oa_leave
+    </sql>
+
+    <select id="selectOaLeaveById" parameterType="Long" resultMap="OaLeaveResult">
+        <include refid="selectOaLeaveVo"/>
+        where leave_id = #{leaveId}
+    </select>
+
+    <select id="selectOaLeaveList" parameterType="OaLeave" resultMap="OaLeaveResult">
+        <include refid="selectOaLeaveVo"/>
+        <where>
+            <if test="leaveType != null and leaveType != ''">
+                AND leave_type = #{leaveType}
+            </if>
+            <if test="approvalStatus != null and approvalStatus != ''">
+                AND approval_status = #{approvalStatus}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND apply_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND apply_time &lt;= #{params.endTime}
+            </if>
+        </where>
+        order by leave_id desc
+    </select>
+
+    <select id="selectOaLeaveListByUserId" parameterType="Long" resultMap="OaLeaveResult">
+        <include refid="selectOaLeaveVo"/>
+        where create_by = (select user_name from sys_user where user_id = #{userId})
+        order by leave_id desc
+    </select>
+
+    <insert id="insertOaLeave" parameterType="OaLeave" useGeneratedKeys="true" keyProperty="leaveId">
+        insert into oa_leave
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="leaveType != null and leaveType != ''">leave_type,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="leaveDays != null">leave_days,</if>
+            <if test="leaveReason != null and leaveReason != ''">leave_reason,</if>
+            <if test="applyTime != null">apply_time,</if>
+            <if test="flowId != null">flow_id,</if>
+            <if test="currentStep != null">current_step,</if>
+            <if test="approvalStatus != null">approval_status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="leaveType != null and leaveType != ''">#{leaveType},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="leaveDays != null">#{leaveDays},</if>
+            <if test="leaveReason != null and leaveReason != ''">#{leaveReason},</if>
+            <if test="applyTime != null">#{applyTime},</if>
+            <if test="flowId != null">#{flowId},</if>
+            <if test="currentStep != null">#{currentStep},</if>
+            <if test="approvalStatus != null">#{approvalStatus},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOaLeave" parameterType="OaLeave">
+        update oa_leave
+        <set>
+            <if test="leaveType != null and leaveType != ''">leave_type = #{leaveType},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="leaveDays != null">leave_days = #{leaveDays},</if>
+            <if test="leaveReason != null">leave_reason = #{leaveReason},</if>
+            <if test="applyTime != null">apply_time = #{applyTime},</if>
+            <if test="flowId != null">flow_id = #{flowId},</if>
+            <if test="currentStep != null">current_step = #{currentStep},</if>
+            <if test="approvalStatus != null">approval_status = #{approvalStatus},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where leave_id = #{leaveId}
+    </update>
+
+    <update id="updateApprovalStatus">
+        update oa_leave set approval_status = #{status}, update_time = sysdate() where leave_id = #{leaveId}
+    </update>
+
+    <delete id="deleteOaLeaveById" parameterType="Long">
+        delete from oa_leave where leave_id = #{leaveId}
+    </delete>
+
+    <delete id="deleteOaLeaveByIds" parameterType="Long">
+        delete from oa_leave where leave_id in
+        <foreach item="leaveId" collection="array" open="(" separator="," close=")">
+            #{leaveId}
+        </foreach>
+    </delete>
+
+</mapper>

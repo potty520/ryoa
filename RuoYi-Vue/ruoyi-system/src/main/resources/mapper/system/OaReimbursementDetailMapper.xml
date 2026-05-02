@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OaReimbursementDetailMapper">
+
+    <resultMap type="OaReimbursementDetail" id="OaReimbursementDetailResult">
+        <result property="detailId" column="detail_id"/>
+        <result property="reimbId" column="reimb_id"/>
+        <result property="expenseType" column="expense_type"/>
+        <result property="expenseDate" column="expense_date"/>
+        <result property="expenseAmount" column="expense_amount"/>
+        <result property="expenseDesc" column="expense_desc"/>
+        <result property="receiptUrl" column="receipt_url"/>
+    </resultMap>
+
+    <select id="selectDetailsByReimbId" resultMap="OaReimbursementDetailResult">
+        select detail_id, reimb_id, expense_type, expense_date, expense_amount, expense_desc, receipt_url
+        from oa_reimbursement_detail
+        where reimb_id = #{reimbId}
+        order by detail_id asc
+    </select>
+
+    <delete id="deleteDetailsByReimbId" parameterType="Long">
+        delete from oa_reimbursement_detail where reimb_id = #{reimbId}
+    </delete>
+
+    <insert id="batchInsertDetails">
+        insert into oa_reimbursement_detail (reimb_id, expense_type, expense_date, expense_amount, expense_desc, receipt_url, create_by, create_time)
+        values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.reimbId}, #{item.expenseType}, #{item.expenseDate}, #{item.expenseAmount}, #{item.expenseDesc}, #{item.receiptUrl}, #{item.createBy}, now())
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.mapper.OaOutgoingDocMapper">
+
+    <resultMap type="OaOutgoingDoc" id="OaOutgoingDocResult">
+        <result property="docId"          column="doc_id"          />
+        <result property="docNum"        column="doc_num"        />
+        <result property="docTitle"      column="doc_title"       />
+        <result property="docTypeId"     column="doc_type_id"    />
+        <result property="docTypeName"   column="doc_type_name"  />
+        <result property="mainUnit"      column="main_unit"      />
+        <result property="copyUnit"      column="copy_unit"      />
+        <result property="docCode"       column="doc_code"       />
+        <result property="docDate"       column="doc_date"        />
+        <result property="docLevel"      column="doc_level"      />
+        <result property="secretLevel"   column="secret_level"   />
+        <result property="attachmentUrl" column="attachment_url" />
+        <result property="docContent"    column="doc_content"    />
+        <result property="flowId"        column="flow_id"        />
+        <result property="currentStep"   column="current_step"   />
+        <result property="currentNode"   column="current_node"   />
+        <result property="docStatus"     column="doc_status"     />
+        <result property="publishDate"  column="publish_date"  />
+        <result property="createBy"       column="create_by"      />
+        <result property="createTime"     column="create_time"    />
+        <result property="updateBy"       column="update_by"      />
+        <result property="updateTime"     column="update_time"    />
+        <result property="remark"          column="remark"         />
+    </resultMap>
+
+    <resultMap type="OaDocFlowStep" id="OaDocFlowStepResult">
+        <result property="stepId"         column="step_id"        />
+        <result property="flowId"         column="flow_id"        />
+        <result property="stepOrder"     column="step_order"    />
+        <result property="stepName"       column="step_name"     />
+        <result property="stepType"      column="step_type"     />
+        <result property="approverType"  column="approver_type" />
+        <result property="approverId"    column="approver_id"   />
+        <result property="approverName"  column="approver_name" />
+        <result property="timeLimit"     column="time_limit"     />
+        <result property="isRequired"    column="is_required"    />
+        <result property="canBack"       column="can_back"       />
+        <result property="backStepId"    column="back_step_id"   />
+    </resultMap>
+
+    <sql id="selectOaOutgoingDocVo">
+        select doc_id, doc_num, doc_title, doc_type_id, doc_type_name, main_unit,
+               copy_unit, doc_code, doc_date, doc_level, secret_level, attachment_url,
+               doc_content, flow_id, current_step, current_node, doc_status, publish_date,
+               create_by, create_time, update_by, update_time, remark
+        from oa_outgoing_doc
+    </sql>
+
+    <select id="selectOaOutgoingDocById" parameterType="Long" resultMap="OaOutgoingDocResult">
+        <include refid="selectOaOutgoingDocVo"/>
+        where doc_id = #{docId}
+    </select>
+
+    <select id="selectOaOutgoingDocList" parameterType="OaOutgoingDoc" resultMap="OaOutgoingDocResult">
+        <include refid="selectOaOutgoingDocVo"/>
+        <where>
+            <if test="docId != null">
+                AND doc_id = #{docId}
+            </if>
+            <if test="docNum != null and docNum != ''">
+                AND doc_num like concat('%', #{docNum}, '%')
+            </if>
+            <if test="docTitle != null and docTitle != ''">
+                AND doc_title like concat('%', #{docTitle}, '%')
+            </if>
+            <if test="mainUnit != null and mainUnit != ''">
+                AND main_unit like concat('%', #{mainUnit}, '%')
+            </if>
+            <if test="docTypeId != null">
+                AND doc_type_id = #{docTypeId}
+            </if>
+            <if test="docStatus != null and docStatus != ''">
+                AND doc_status = #{docStatus}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                AND create_by = #{createBy}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND create_time &lt;= #{params.endTime}
+            </if>
+        </where>
+        order by doc_id desc
+    </select>
+
+    <insert id="insertOaOutgoingDoc" parameterType="OaOutgoingDoc" useGeneratedKeys="true" keyProperty="docId">
+        insert into oa_outgoing_doc
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="docNum != null and docNum != ''">doc_num,</if>
+            <if test="docTitle != null and docTitle != ''">doc_title,</if>
+            <if test="docTypeId != null">doc_type_id,</if>
+            <if test="docTypeName != null and docTypeName != ''">doc_type_name,</if>
+            <if test="mainUnit != null and mainUnit != ''">main_unit,</if>
+            <if test="copyUnit != null and copyUnit != ''">copy_unit,</if>
+            <if test="docCode != null and docCode != ''">doc_code,</if>
+            <if test="docDate != null">doc_date,</if>
+            <if test="docLevel != null and docLevel != ''">doc_level,</if>
+            <if test="secretLevel != null and secretLevel != ''">secret_level,</if>
+            <if test="attachmentUrl != null and attachmentUrl != ''">attachment_url,</if>
+            <if test="docContent != null">doc_content,</if>
+            <if test="flowId != null">flow_id,</if>
+            <if test="currentStep != null">current_step,</if>
+            <if test="currentNode != null and currentNode != ''">current_node,</if>
+            <if test="docStatus != null and docStatus != ''">doc_status,</if>
+            <if test="publishDate != null">publish_date,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="docNum != null and docNum != ''">#{docNum},</if>
+            <if test="docTitle != null and docTitle != ''">#{docTitle},</if>
+            <if test="docTypeId != null">#{docTypeId},</if>
+            <if test="docTypeName != null and docTypeName != ''">#{docTypeName},</if>
+            <if test="mainUnit != null and mainUnit != ''">#{mainUnit},</if>
+            <if test="copyUnit != null and copyUnit != ''">#{copyUnit},</if>
+            <if test="docCode != null and docCode != ''">#{docCode},</if>
+            <if test="docDate != null">#{docDate},</if>
+            <if test="docLevel != null and docLevel != ''">#{docLevel},</if>
+            <if test="secretLevel != null and secretLevel != ''">#{secretLevel},</if>
+            <if test="attachmentUrl != null and attachmentUrl != ''">#{attachmentUrl},</if>
+            <if test="docContent != null">#{docContent},</if>
+            <if test="flowId != null">#{flowId},</if>
+            <if test="currentStep != null">#{currentStep},</if>
+            <if test="currentNode != null and currentNode != ''">#{currentNode},</if>
+            <if test="docStatus != null and docStatus != ''">#{docStatus},</if>
+            <if test="publishDate != null">#{publishDate},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOaOutgoingDoc" parameterType="OaOutgoingDoc">
+        update oa_outgoing_doc
+        <set>
+            <if test="docNum != null and docNum != ''">doc_num = #{docNum},</if>
+            <if test="docTitle != null and docTitle != ''">doc_title = #{docTitle},</if>
+            <if test="docTypeId != null">doc_type_id = #{docTypeId},</if>
+            <if test="docTypeName != null and docTypeName != ''">doc_type_name = #{docTypeName},</if>
+            <if test="mainUnit != null and mainUnit != ''">main_unit = #{mainUnit},</if>
+            <if test="copyUnit != null and copyUnit != ''">copy_unit = #{copyUnit},</if>
+            <if test="docCode != null and docCode != ''">doc_code = #{docCode},</if>
+            <if test="docDate != null">doc_date = #{docDate},</if>
+            <if test="docLevel != null and docLevel != ''">doc_level = #{docLevel},</if>
+            <if test="secretLevel != null and secretLevel != ''">secret_level = #{secretLevel},</if>
+            <if test="attachmentUrl != null">attachment_url = #{attachmentUrl},</if>
+            <if test="docContent != null">doc_content = #{docContent},</if>
+            <if test="flowId != null">flow_id = #{flowId},</if>
+            <if test="currentStep != null">current_step = #{currentStep},</if>
+            <if test="currentNode != null and currentNode != ''">current_node = #{currentNode},</if>
+            <if test="docStatus != null and docStatus != ''">doc_status = #{docStatus},</if>
+            <if test="publishDate != null">publish_date = #{publishDate},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where doc_id = #{docId}
+    </update>
+
+    <update id="updateDocStatus">
+        update oa_outgoing_doc
+        set doc_status = #{status},
+            current_step = #{currentStep},
+            current_node = #{currentNode},
+            update_time = sysdate()
+        where doc_id = #{docId}
+    </update>
+
+    <select id="selectNextFlowStep" resultMap="OaDocFlowStepResult">
+        select step_id, flow_id, step_order, step_name, step_type, approver_type,
+               approver_id, approver_name, time_limit, is_required, can_back, back_step_id
+        from oa_doc_flow_step
+        where flow_id = #{flowId} and step_order = #{currentStep} + 1
+        limit 1
+    </select>
+
+    <select id="countByFlowIds" parameterType="Long" resultType="int">
+        select count(1)
+        from oa_outgoing_doc
+        where flow_id in
+        <foreach item="flowId" collection="array" open="(" separator="," close=")">
+            #{flowId}
+        </foreach>
+    </select>
+
+    <delete id="deleteOaOutgoingDocById" parameterType="Long">
+        delete from oa_outgoing_doc where doc_id = #{docId}
+    </delete>
+
+    <delete id="deleteOaOutgoingDocByIds" parameterType="Long">
+        delete from oa_outgoing_doc where doc_id in
+        <foreach item="docId" collection="array" open="(" separator="," close=")">
+            #{docId}
+        </foreach>
+    </delete>
+
+</mapper>

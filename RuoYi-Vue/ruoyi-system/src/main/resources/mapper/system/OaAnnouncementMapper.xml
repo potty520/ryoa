@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OaAnnouncementMapper">
+
+    <resultMap type="OaAnnouncement" id="OaAnnouncementResult">
+        <result property="annId"           column="ann_id"           />
+        <result property="annTitle"        column="ann_title"        />
+        <result property="annType"         column="ann_type"         />
+        <result property="annContent"      column="ann_content"      />
+        <result property="annLevel"        column="ann_level"        />
+        <result property="attachmentUrl"   column="attachment_url"   />
+        <result property="publishStart"    column="publish_start"    />
+        <result property="publishEnd"      column="publish_end"      />
+        <result property="isTop"           column="is_top"           />
+        <result property="isPublic"        column="is_public"        />
+        <result property="viewCount"       column="view_count"       />
+        <result property="status"          column="status"           />
+        <result property="createBy"         column="create_by"        />
+        <result property="createTime"       column="create_time"      />
+        <result property="updateBy"         column="update_by"        />
+        <result property="updateTime"       column="update_time"      />
+        <result property="remark"           column="remark"           />
+    </resultMap>
+
+    <sql id="selectOaAnnouncementVo">
+        select ann_id, ann_title, ann_type, ann_content, ann_level, attachment_url,
+               publish_start, publish_end, is_top, is_public, view_count, status,
+               create_by, create_time, update_by, update_time, remark
+        from oa_announcement
+    </sql>
+
+    <select id="selectOaAnnouncementById" parameterType="Long" resultMap="OaAnnouncementResult">
+        <include refid="selectOaAnnouncementVo"/>
+        where ann_id = #{annId}
+    </select>
+
+    <select id="selectOaAnnouncementList" parameterType="OaAnnouncement" resultMap="OaAnnouncementResult">
+        <include refid="selectOaAnnouncementVo"/>
+        <where>
+            <if test="annTitle != null and annTitle != ''">
+                AND ann_title like concat('%', #{annTitle}, '%')
+            </if>
+            <if test="annType != null and annType != ''">
+                AND ann_type = #{annType}
+            </if>
+            <if test="annLevel != null and annLevel != ''">
+                AND ann_level = #{annLevel}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND date_format(publish_start,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND date_format(publish_start,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by is_top desc, ann_id desc
+    </select>
+
+    <select id="selectPublishedAnnouncementList" parameterType="OaAnnouncement" resultMap="OaAnnouncementResult">
+        <include refid="selectOaAnnouncementVo"/>
+        <where>
+            status = '1'
+            <if test="annTitle != null and annTitle != ''">
+                AND ann_title like concat('%', #{annTitle}, '%')
+            </if>
+            <if test="annType != null and annType != ''">
+                AND ann_type = #{annType}
+            </if>
+            <if test="isPublic != null and isPublic != ''">
+                AND is_public = #{isPublic}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND publish_start &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND publish_start &lt;= #{params.endTime}
+            </if>
+        </where>
+        order by is_top desc, publish_start desc
+    </select>
+
+    <insert id="insertOaAnnouncement" parameterType="OaAnnouncement" useGeneratedKeys="true" keyProperty="annId">
+        insert into oa_announcement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="annTitle != null and annTitle != ''">ann_title,</if>
+            <if test="annType != null and annType != ''">ann_type,</if>
+            <if test="annContent != null">ann_content,</if>
+            <if test="annLevel != null and annLevel != ''">ann_level,</if>
+            <if test="attachmentUrl != null and attachmentUrl != ''">attachment_url,</if>
+            <if test="publishStart != null">publish_start,</if>
+            <if test="publishEnd != null">publish_end,</if>
+            <if test="isTop != null">is_top,</if>
+            <if test="isPublic != null">is_public,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="annTitle != null and annTitle != ''">#{annTitle},</if>
+            <if test="annType != null and annType != ''">#{annType},</if>
+            <if test="annContent != null">#{annContent},</if>
+            <if test="annLevel != null and annLevel != ''">#{annLevel},</if>
+            <if test="attachmentUrl != null and attachmentUrl != ''">#{attachmentUrl},</if>
+            <if test="publishStart != null">#{publishStart},</if>
+            <if test="publishEnd != null">#{publishEnd},</if>
+            <if test="isTop != null">#{isTop},</if>
+            <if test="isPublic != null">#{isPublic},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOaAnnouncement" parameterType="OaAnnouncement">
+        update oa_announcement
+        <set>
+            <if test="annTitle != null and annTitle != ''">ann_title = #{annTitle},</if>
+            <if test="annType != null and annType != ''">ann_type = #{annType},</if>
+            <if test="annContent != null">ann_content = #{annContent},</if>
+            <if test="annLevel != null and annLevel != ''">ann_level = #{annLevel},</if>
+            <if test="attachmentUrl != null">attachment_url = #{attachmentUrl},</if>
+            <if test="publishStart != null">publish_start = #{publishStart},</if>
+            <if test="publishEnd != null">publish_end = #{publishEnd},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
+            <if test="isPublic != null">is_public = #{isPublic},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where ann_id = #{annId}
+    </update>
+
+    <delete id="deleteOaAnnouncementById" parameterType="Long">
+        delete from oa_announcement where ann_id = #{annId}
+    </delete>
+
+    <delete id="deleteOaAnnouncementByIds" parameterType="Long">
+        delete from oa_announcement where ann_id in
+        <foreach item="annId" collection="array" open="(" separator="," close=")">
+            #{annId}
+        </foreach>
+    </delete>
+
+    <update id="incrementViewCount" parameterType="Long">
+        update oa_announcement set view_count = view_count + 1 where ann_id = #{annId}
+    </update>
+
+    <select id="selectUnreadCount" parameterType="Long" resultType="int">
+        select count(1) from oa_announcement a
+        left join oa_announcement_read ar on a.ann_id = ar.ann_id and ar.user_id = #{userId}
+        where a.status = '1' and (a.is_public = '1' or exists (select 1 from sys_user where user_id = #{userId}))
+        and ar.read_id is null
+    </select>
+
+</mapper>

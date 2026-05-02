@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.mapper.OaDocFlowStepMapper">
+
+    <resultMap type="OaDocFlowStep" id="OaDocFlowStepResult">
+        <result property="stepId"        column="step_id"        />
+        <result property="flowId"        column="flow_id"        />
+        <result property="stepOrder"    column="step_order"    />
+        <result property="stepName"     column="step_name"     />
+        <result property="stepType"     column="step_type"     />
+        <result property="approverType" column="approver_type" />
+        <result property="approverId"   column="approver_id"   />
+        <result property="approverName" column="approver_name" />
+        <result property="timeLimit"    column="time_limit"    />
+        <result property="isRequired"   column="is_required"   />
+        <result property="canBack"      column="can_back"       />
+        <result property="backStepId"   column="back_step_id"   />
+        <result property="createTime"   column="create_time"   />
+    </resultMap>
+
+    <sql id="selectOaDocFlowStepVo">
+        select step_id, flow_id, step_order, step_name, step_type, approver_type,
+               approver_id, approver_name, time_limit, is_required, can_back, back_step_id,
+               create_time
+        from oa_doc_flow_step
+    </sql>
+
+    <select id="selectOaDocFlowStepById" parameterType="Long" resultMap="OaDocFlowStepResult">
+        <include refid="selectOaDocFlowStepVo"/>
+        where step_id = #{stepId}
+    </select>
+
+    <select id="selectOaDocFlowStepList" parameterType="Long" resultMap="OaDocFlowStepResult">
+        <include refid="selectOaDocFlowStepVo"/>
+        where flow_id = #{flowId}
+        order by step_order asc
+    </select>
+
+    <insert id="insertOaDocFlowStep" parameterType="OaDocFlowStep">
+        insert into oa_doc_flow_step
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="flowId != null">flow_id,</if>
+            <if test="stepOrder != null">step_order,</if>
+            <if test="stepName != null and stepName != ''">step_name,</if>
+            <if test="stepType != null and stepType != ''">step_type,</if>
+            <if test="approverType != null and approverType != ''">approver_type,</if>
+            <if test="approverId != null">approver_id,</if>
+            <if test="approverName != null and approverName != ''">approver_name,</if>
+            <if test="timeLimit != null">time_limit,</if>
+            <if test="isRequired != null and isRequired != ''">is_required,</if>
+            <if test="canBack != null and canBack != ''">can_back,</if>
+            <if test="backStepId != null">back_step_id,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="flowId != null">#{flowId},</if>
+            <if test="stepOrder != null">#{stepOrder},</if>
+            <if test="stepName != null and stepName != ''">#{stepName},</if>
+            <if test="stepType != null and stepType != ''">#{stepType},</if>
+            <if test="approverType != null and approverType != ''">#{approverType},</if>
+            <if test="approverId != null">#{approverId},</if>
+            <if test="approverName != null and approverName != ''">#{approverName},</if>
+            <if test="timeLimit != null">#{timeLimit},</if>
+            <if test="isRequired != null and isRequired != ''">#{isRequired},</if>
+            <if test="canBack != null and canBack != ''">#{canBack},</if>
+            <if test="backStepId != null">#{backStepId},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsertOaDocFlowStep">
+        insert into oa_doc_flow_step (flow_id, step_order, step_name, step_type, approver_type,
+                                      approver_id, approver_name, time_limit, is_required, can_back,
+                                      back_step_id, create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.flowId}, #{item.stepOrder}, #{item.stepName}, #{item.stepType}, #{item.approverType},
+             #{item.approverId}, #{item.approverName}, #{item.timeLimit}, #{item.isRequired}, #{item.canBack},
+             #{item.backStepId}, sysdate())
+        </foreach>
+    </insert>
+
+    <update id="updateOaDocFlowStep" parameterType="OaDocFlowStep">
+        update oa_doc_flow_step
+        <set>
+            <if test="stepOrder != null">step_order = #{stepOrder},</if>
+            <if test="stepName != null and stepName != ''">step_name = #{stepName},</if>
+            <if test="stepType != null and stepType != ''">step_type = #{stepType},</if>
+            <if test="approverType != null and approverType != ''">approver_type = #{approverType},</if>
+            <if test="approverId != null">approver_id = #{approverId},</if>
+            <if test="approverName != null and approverName != ''">approver_name = #{approverName},</if>
+            <if test="timeLimit != null">time_limit = #{timeLimit},</if>
+            <if test="isRequired != null and isRequired != ''">is_required = #{isRequired},</if>
+            <if test="canBack != null and canBack != ''">can_back = #{canBack},</if>
+            <if test="backStepId != null">back_step_id = #{backStepId},</if>
+        </set>
+        where step_id = #{stepId}
+    </update>
+
+    <delete id="deleteOaDocFlowStepById" parameterType="Long">
+        delete from oa_doc_flow_step where step_id = #{stepId}
+    </delete>
+
+    <delete id="deleteOaDocFlowStepByIds" parameterType="Long">
+        delete from oa_doc_flow_step where step_id in
+        <foreach item="stepId" collection="array" open="(" separator="," close=")">
+            #{stepId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteStepsByFlowId" parameterType="Long">
+        delete from oa_doc_flow_step where flow_id = #{flowId}
+    </delete>
+
+</mapper>

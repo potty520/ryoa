@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OaReimbursementApproveLogMapper">
+
+    <resultMap type="OaReimbursementApproveLog" id="OaReimbursementApproveLogResult">
+        <result property="logId" column="log_id"/>
+        <result property="reimbId" column="reimb_id"/>
+        <result property="approveResult" column="approve_result"/>
+        <result property="approveRemark" column="approve_remark"/>
+        <result property="approveBy" column="approve_by"/>
+        <result property="approveTime" column="approve_time"/>
+    </resultMap>
+
+    <insert id="insertApproveLog" parameterType="OaReimbursementApproveLog" useGeneratedKeys="true" keyProperty="logId">
+        insert into oa_reimbursement_approve_log
+        (reimb_id, approve_result, approve_remark, approve_by, approve_time)
+        values
+        (#{reimbId}, #{approveResult}, #{approveRemark}, #{approveBy}, #{approveTime})
+    </insert>
+
+    <select id="selectLogsByReimbId" resultMap="OaReimbursementApproveLogResult">
+        select log_id, reimb_id, approve_result, approve_remark, approve_by, approve_time
+        from oa_reimbursement_approve_log
+        where reimb_id = #{reimbId}
+        order by log_id desc
+    </select>
+
+</mapper>

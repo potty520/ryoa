@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OaReimbursementMapper">
+
+    <resultMap type="OaReimbursement" id="OaReimbursementResult">
+        <result property="reimbId" column="reimb_id"/>
+        <result property="reimbType" column="reimb_type"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="reimbReason" column="reimb_reason"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="flowId" column="flow_id"/>
+        <result property="currentStep" column="current_step"/>
+        <result property="approvalStatus" column="approval_status"/>
+        <result property="paymentStatus" column="payment_status"/>
+        <result property="paymentTime" column="payment_time"/>
+        <result property="approveBy" column="approve_by"/>
+        <result property="approveTime" column="approve_time"/>
+        <result property="approveRemark" column="approve_remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaReimbursementVo">
+        select reimb_id, reimb_type, total_amount, reimb_reason, apply_time, flow_id, current_step,
+               approval_status, payment_status, payment_time, approve_by, approve_time, approve_remark,
+               create_by, create_time, update_by, update_time, remark
+        from oa_reimbursement
+    </sql>
+
+    <select id="selectOaReimbursementByReimbId" parameterType="Long" resultMap="OaReimbursementResult">
+        <include refid="selectOaReimbursementVo"/>
+        where reimb_id = #{reimbId}
+    </select>
+
+    <select id="selectOaReimbursementList" parameterType="OaReimbursement" resultMap="OaReimbursementResult">
+        <include refid="selectOaReimbursementVo"/>
+        <where>
+            <if test="reimbType != null and reimbType != ''">and reimb_type = #{reimbType}</if>
+            <if test="approvalStatus != null and approvalStatus != ''">and approval_status = #{approvalStatus}</if>
+            <if test="paymentStatus != null and paymentStatus != ''">and payment_status = #{paymentStatus}</if>
+            <if test="params != null and params.beginApplyTime != null and params.beginApplyTime != ''"><![CDATA[and apply_time >= #{params.beginApplyTime}]]></if>
+            <if test="params != null and params.endApplyTime != null and params.endApplyTime != ''"><![CDATA[and apply_time <= #{params.endApplyTime}]]></if>
+            <if test="createBy != null and createBy != ''">and create_by = #{createBy}</if>
+        </where>
+        order by reimb_id desc
+    </select>
+
+    <select id="selectOaReimbursementListByUserId" resultMap="OaReimbursementResult">
+        <include refid="selectOaReimbursementVo"/>
+        where create_by = (select user_name from sys_user where user_id = #{userId})
+        order by reimb_id desc
+    </select>
+
+    <insert id="insertOaReimbursement" parameterType="OaReimbursement" useGeneratedKeys="true" keyProperty="reimbId">
+        insert into oa_reimbursement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reimbType != null and reimbType != ''">reimb_type,</if>
+            <if test="totalAmount != null">total_amount,</if>
+            <if test="reimbReason != null and reimbReason != ''">reimb_reason,</if>
+            <if test="applyTime != null">apply_time,</if>
+            <if test="flowId != null">flow_id,</if>
+            <if test="currentStep != null">current_step,</if>
+            <if test="approvalStatus != null and approvalStatus != ''">approval_status,</if>
+            <if test="paymentStatus != null and paymentStatus != ''">payment_status,</if>
+            <if test="paymentTime != null">payment_time,</if>
+            <if test="approveBy != null and approveBy != ''">approve_by,</if>
+            <if test="approveTime != null">approve_time,</if>
+            <if test="approveRemark != null and approveRemark != ''">approve_remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reimbType != null and reimbType != ''">#{reimbType},</if>
+            <if test="totalAmount != null">#{totalAmount},</if>
+            <if test="reimbReason != null and reimbReason != ''">#{reimbReason},</if>
+            <if test="applyTime != null">#{applyTime},</if>
+            <if test="flowId != null">#{flowId},</if>
+            <if test="currentStep != null">#{currentStep},</if>
+            <if test="approvalStatus != null and approvalStatus != ''">#{approvalStatus},</if>
+            <if test="paymentStatus != null and paymentStatus != ''">#{paymentStatus},</if>
+            <if test="paymentTime != null">#{paymentTime},</if>
+            <if test="approveBy != null and approveBy != ''">#{approveBy},</if>
+            <if test="approveTime != null">#{approveTime},</if>
+            <if test="approveRemark != null and approveRemark != ''">#{approveRemark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOaReimbursement" parameterType="OaReimbursement">
+        update oa_reimbursement
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reimbType != null and reimbType != ''">reimb_type = #{reimbType},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="reimbReason != null and reimbReason != ''">reimb_reason = #{reimbReason},</if>
+            <if test="applyTime != null">apply_time = #{applyTime},</if>
+            <if test="flowId != null">flow_id = #{flowId},</if>
+            <if test="currentStep != null">current_step = #{currentStep},</if>
+            <if test="approvalStatus != null and approvalStatus != ''">approval_status = #{approvalStatus},</if>
+            <if test="paymentStatus != null and paymentStatus != ''">payment_status = #{paymentStatus},</if>
+            <if test="paymentTime != null">payment_time = #{paymentTime},</if>
+            <if test="approveBy != null">approve_by = #{approveBy},</if>
+            <if test="approveTime != null">approve_time = #{approveTime},</if>
+            <if test="approveRemark != null">approve_remark = #{approveRemark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where reimb_id = #{reimbId}
+    </update>
+
+    <delete id="deleteOaReimbursementByReimbId" parameterType="Long">
+        delete from oa_reimbursement where reimb_id = #{reimbId}
+    </delete>
+
+    <delete id="deleteOaReimbursementByReimbIds" parameterType="String">
+        delete from oa_reimbursement where reimb_id in
+        <foreach item="reimbId" collection="array" open="(" separator="," close=")">
+            #{reimbId}
+        </foreach>
+    </delete>
+
+</mapper>

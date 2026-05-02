@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.mapper.OaDocFlowMapper">
+
+    <resultMap type="OaDocFlow" id="OaDocFlowResult">
+        <result property="flowId"         column="flow_id"        />
+        <result property="flowName"      column="flow_name"     />
+        <result property="flowCategory" column="flow_category" />
+        <result property="isDefault"    column="is_default"    />
+        <result property="isActive"     column="is_active"     />
+        <result property="createBy"      column="create_by"     />
+        <result property="createTime"    column="create_time"   />
+        <result property="updateBy"      column="update_by"     />
+        <result property="updateTime"    column="update_time"   />
+        <result property="remark"         column="remark"        />
+    </resultMap>
+
+    <sql id="selectOaDocFlowVo">
+        select flow_id, flow_name, flow_category, is_default, is_active,
+               create_by, create_time, update_by, update_time, remark
+        from oa_doc_flow
+    </sql>
+
+    <select id="selectOaDocFlowById" parameterType="Long" resultMap="OaDocFlowResult">
+        <include refid="selectOaDocFlowVo"/>
+        where flow_id = #{flowId}
+    </select>
+
+    <select id="selectOaDocFlowList" parameterType="OaDocFlow" resultMap="OaDocFlowResult">
+        <include refid="selectOaDocFlowVo"/>
+        <where>
+            <if test="flowName != null and flowName != ''">
+                AND flow_name like concat('%', #{flowName}, '%')
+            </if>
+            <if test="flowCategory != null and flowCategory != ''">
+                AND flow_category = #{flowCategory}
+            </if>
+            <if test="isDefault != null and isDefault != ''">
+                AND is_default = #{isDefault}
+            </if>
+            <if test="isActive != null and isActive != ''">
+                AND is_active = #{isActive}
+            </if>
+        </where>
+        order by flow_id desc
+    </select>
+
+    <select id="selectDefaultFlow" parameterType="String" resultMap="OaDocFlowResult">
+        <include refid="selectOaDocFlowVo"/>
+        where flow_category = #{flowCategory} and is_default = '1' and is_active = '1'
+        limit 1
+    </select>
+
+    <select id="countDefaultFlowByCategory" resultType="int">
+        select count(1)
+        from oa_doc_flow
+        where flow_category = #{flowCategory}
+          and is_default = '1'
+        <if test="excludeFlowId != null">
+          and flow_id != #{excludeFlowId}
+        </if>
+    </select>
+
+    <insert id="insertOaDocFlow" parameterType="OaDocFlow" useGeneratedKeys="true" keyProperty="flowId">
+        insert into oa_doc_flow
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="flowName != null and flowName != ''">flow_name,</if>
+            <if test="flowCategory != null and flowCategory != ''">flow_category,</if>
+            <if test="isDefault != null and isDefault != ''">is_default,</if>
+            <if test="isActive != null and isActive != ''">is_active,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="flowName != null and flowName != ''">#{flowName},</if>
+            <if test="flowCategory != null and flowCategory != ''">#{flowCategory},</if>
+            <if test="isDefault != null and isDefault != ''">#{isDefault},</if>
+            <if test="isActive != null and isActive != ''">#{isActive},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOaDocFlow" parameterType="OaDocFlow">
+        update oa_doc_flow
+        <set>
+            <if test="flowName != null and flowName != ''">flow_name = #{flowName},</if>
+            <if test="flowCategory != null and flowCategory != ''">flow_category = #{flowCategory},</if>
+            <if test="isDefault != null and isDefault != ''">is_default = #{isDefault},</if>
+            <if test="isActive != null and isActive != ''">is_active = #{isActive},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where flow_id = #{flowId}
+    </update>
+
+    <delete id="deleteOaDocFlowById" parameterType="Long">
+        delete from oa_doc_flow where flow_id = #{flowId}
+    </delete>
+
+    <delete id="deleteOaDocFlowByIds" parameterType="Long">
+        delete from oa_doc_flow where flow_id in
+        <foreach item="flowId" collection="array" open="(" separator="," close=")">
+            #{flowId}
+        </foreach>
+    </delete>
+
+</mapper>
